@@ -4,10 +4,10 @@ from init_llm import deepseek_llm
 # resp=deepseek_llm.invoke("你是谁？")
 # print(resp)
 
-# 需要结构化的 todo 官方推荐的结构化输出
+# 需要结构化的 todo TypedDict的结构化输出
 
-# from typing_extensions import TypedDict, Annotated
-from typing import TypedDict, List, Annotated
+from typing_extensions import TypedDict, Annotated,List
+# from typing import TypedDict, List, Annotated
 
 
 # 使用TypedDict定义嵌套结构
