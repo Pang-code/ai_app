@@ -14,6 +14,8 @@ def get_stock_price(company: str, timeframe: str = "today") -> str:
         company: 公司名称（如：苹果公司, 微软公司, 谷歌公司）
         timeframe: 时间范围（today-今日, week-本周, month-本月）
     """
+    raise ValueError("获取股票信息失败")
+
     # 模拟股票数据
     mock_data = {
         "苹果公司": {"today": 185.20, "week": 183.50, "month": 180.75},
@@ -66,7 +68,7 @@ basic_model = deepseek_llm
 
 advanced_model = tongyi_llm
 
-from langchain.agents.middleware import wrap_model_call, ModelRequest, ModelResponse, dynamic_prompt
+from langchain.agents.middleware import wrap_model_call, ModelRequest, ModelResponse, dynamic_prompt, wrap_tool_call
 
 
 # 1. 定义动态模型选择中间件
@@ -102,10 +104,22 @@ def dynamic_prompt(request: ModelRequest) -> str:
         return "直接回答用户的问题。"
 
 
+@wrap_tool_call
+def dynamic_tool_call(request: ModelRequest, handler) -> ModelResponse:
+    """根据用户类型动态调用工具"""
+    try:
+        return handler(request)
+    except Exception as e:
+        # 向模型返回自定义错误消息
+        return ToolMessage(
+            content=f"调用工具错误:错误信息: {str(e)}",
+            tool_call_id=request.tool_call["id"]
+        )
+
 agent = create_agent(
     model=basic_model,
     tools=[get_stock_price, search_news],
-    middleware=[dynamic_model_selection, dynamic_prompt]
+    middleware=[dynamic_model_selection, dynamic_prompt, dynamic_tool_call]
 )
 
 resp = agent.invoke(
