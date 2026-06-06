@@ -16,9 +16,21 @@ json_schema = {
         "title": {"type": "string", "description": "电影标题"},
         "year": {"type": "integer", "description": "上映年份"},
         "director": {"type": "string", "description": "导演"},
-        "rating": {"type": "number", "description": "评分（10分制）"}
+        "rating": {"type": "number", "description": "评分（10分制）"},
+        "cast": {  # 定义嵌套数组
+            "type": "array",
+            "description": "演员列表",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string", "description": "演员姓名"},
+                    "role": {"type": "string", "description": "演员角色"}
+                },
+                "required": ["name", "role"]
+            }
+        },
     },
-    "required": ["title", "year", "director", "rating"]
+    "required": ["title", "year", "director", "rating", "cast"]
 }
 
 model_with_structure = deepseek_llm.with_structured_output(json_schema)
