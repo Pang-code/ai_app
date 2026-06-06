@@ -66,7 +66,7 @@ basic_model = deepseek_llm
 
 advanced_model = tongyi_llm
 
-from langchain.agents.middleware import wrap_model_call, ModelRequest, ModelResponse
+from langchain.agents.middleware import wrap_model_call, ModelRequest, ModelResponse, dynamic_prompt
 
 
 # 1. 定义动态模型选择中间件
@@ -91,14 +91,26 @@ def dynamic_model_selection(request: ModelRequest, handler) -> ModelResponse:
     return handler(request.override(model=model))
 
 
+@dynamic_prompt
+def dynamic_prompt(request: ModelRequest) -> str:
+    """根据用户类型动态生成系统提示"""
+
+    user_type = request.runtime.context.get("user_type", "normal")
+    if user_type == "vip":
+        return "回答用户之前，首先称呼。尊贵的vip用户你好。再回答用户的问题。"
+    else:
+        return "直接回答用户的问题。"
+
+
 agent = create_agent(
     model=basic_model,
     tools=[get_stock_price, search_news],
-    middleware=[dynamic_model_selection]
+    middleware=[dynamic_model_selection, dynamic_prompt]
 )
 
 resp = agent.invoke(
-    {"messages": [{"role": "user", "content": "苹果公司今天的股价是多少和最新新闻是什么？"}]}
+    {"messages": [{"role": "user", "content": "苹果公司今天的股价是多少和最新新闻是什么？"}]},
+    context={"user_type": "vip"}
 )
-print(resp["messages"])
 print(resp)
+print(resp["messages"][-1].content)
