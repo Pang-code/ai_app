@@ -35,13 +35,13 @@ deepseek_llm: BaseChatModel = init_chat_model(
 # )
 #
 #
-# tongyi_llm = init_chat_model(
-#     model="qwen-plus",
-#     model_provider="openai",
-#     api_key=DASHSCOPE_API_KEY,
-#     base_url=DASHSCOPE_BASE_URL,
-#
-# )
+tongyi_llm = init_chat_model(
+    model="qwen3.7-max",
+    model_provider="openai",
+    api_key=DASHSCOPE_API_KEY,
+    base_url=DASHSCOPE_BASE_URL,
+
+)
 #
 # zhipu_llm = init_chat_model(
 #     model="glm-4",
