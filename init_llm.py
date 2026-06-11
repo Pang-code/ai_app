@@ -6,6 +6,7 @@ from env_utils import DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL, OPENAI_API_KEY, OPENA
 
 deepseek_llm: BaseChatModel = init_chat_model(
     model="deepseek-v4-pro",
+    # model="deepseek-r1",
     # model_provider="deepseek", # deepseek的
     model_provider="openai",  # 阿里百炼的deepseek
     api_key=DEEPSEEK_API_KEY,
