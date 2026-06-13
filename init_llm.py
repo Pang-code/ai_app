@@ -44,14 +44,15 @@ tongyi_llm = init_chat_model(
 
 )
 #
-# zhipu_llm = init_chat_model(
-#     model="glm-4",
-#     model_provider="openai",
-#     api_key=ZHIPUAI_API_KEY,
-#     base_url=ZHIPUAI_BASE_URL,
-#
-# )
+zhipu_llm = init_chat_model(
+    model="glm-5.1",
+    model_provider="openai",
+    api_key=ZHIPUAI_API_KEY,
+    base_url=ZHIPUAI_BASE_URL,
+
+)
 
 
 if __name__ == '__main__':
     print(deepseek_llm.invoke("你是谁？"))
+    print(zhipu_llm.invoke("你是谁？"))

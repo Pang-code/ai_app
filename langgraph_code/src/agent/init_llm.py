@@ -1,7 +1,7 @@
 from langchain.chat_models import init_chat_model
 from langchain_core.language_models import BaseChatModel
 
-from agent.env_utils import DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL, DASHSCOPE_API_KEY, DASHSCOPE_BASE_URL
+from agent.env_utils import DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL, DASHSCOPE_API_KEY, DASHSCOPE_BASE_URL,ZHIPUAI_API_KEY,ZHIPUAI_BASE_URL
 
 deepseek_llm: BaseChatModel = init_chat_model(
     model="deepseek-v4-pro",
@@ -43,14 +43,16 @@ tongyi_llm = init_chat_model(
 
 )
 #
-# zhipu_llm = init_chat_model(
-#     model="glm-4",
-#     model_provider="openai",
-#     api_key=ZHIPUAI_API_KEY,
-#     base_url=ZHIPUAI_BASE_URL,
-#
-# )
+zhipu_llm = init_chat_model(
+    model="glm-5.1",
+    model_provider="openai",
+    api_key=ZHIPUAI_API_KEY,
+    base_url=ZHIPUAI_BASE_URL,
+
+)
 
 
 if __name__ == '__main__':
-    print(deepseek_llm.invoke("你是谁？"))
+    # print(deepseek_llm.invoke("你是谁？"))
+    print(zhipu_llm.invoke("你是谁？"))
+    print(zhipu_llm.web)
