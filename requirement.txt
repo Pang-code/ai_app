@@ -18,7 +18,7 @@ dashscope==1.25.6
 #安装 ChatZhipuAI依赖包
 pyjwt==2.10.1
 #langchain-qwq
-
+cryptography
 
 
 
