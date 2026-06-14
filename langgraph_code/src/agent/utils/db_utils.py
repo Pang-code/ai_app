@@ -83,7 +83,7 @@ class MySQLDatabaseManager:
 
     from sqlalchemy import text
 
-    def validate_query(self, query: str) -> str:
+    def old_validate_query(self, query: str) -> str:
         """
         验证SQL查询语法是否正确
 
@@ -110,6 +110,39 @@ class MySQLDatabaseManager:
         except Exception as e:
             log.exception(e)
             return f"SQL语法错误：{str(e)}"
+
+
+    def validate_query(self, query: str) -> str:
+        """
+        验证SQL查询语法是否正确
+
+        Args:
+            query: 要验证的SQL查询
+        """
+        # 基本语法检查
+        if not query or not query.strip():
+            return "错误：查询不能为空"
+
+        # 检查是否以SELECT或WITH开头
+        query_lower = query.lower().strip()
+        if not query_lower.startswith(('select', 'with')):
+            return "警告：建议使用SELECT或WITH查询，其他操作可能被限制"
+
+        try:
+            with self.engine.connect() as connection:
+                # 根据数据库方言构建EXPLAIN查询
+                if self.engine.dialect.name == 'mysql':
+                    explain_query = text(f"EXPLAIN {query}")
+                else:
+                    # 其他数据库（如PostgreSQL, SQLite），它们的EXPLAIN语法类似
+                    explain_query = text(f"EXPLAIN {query}")
+
+                # 执行EXPLAIN，如果查询无效，此处会抛出异常
+                connection.execute(explain_query)
+                return "SQL查询语法正确（已通过数据库EXPLAIN验证）"
+
+        except SQLAlchemyError as e:
+            return f"SQL语法错误: {str(e)}"
 
     def get_tables_with_comments(self) -> List[dict]:
         try:
