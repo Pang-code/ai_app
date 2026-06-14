@@ -94,5 +94,17 @@ agent = create_agent(
 )
 
 
-
+# 启动1.
 # langgraph dev --allow-blocking  # 允许阻塞的操作
+
+if __name__ == '__main__':
+
+    # 启动2.
+    # 使用agent.stream()流式执行，查看每一步的输出
+    for step in agent.stream(
+        input={'messages': [{'role': 'user', 'content': '数据库中有多少个部门，每个部门都有哪些员工?'}]},
+        stream_mode="values"
+    ):
+        step['messages'][-1].pretty_print()  # 打印每一步的最新消息
+
+
