@@ -68,7 +68,7 @@ print(json.dumps(resp.__dict__))
 
 
 
-# 2. SimpleJsonOutputParser 回答的问题还会衍生一个问题
+# 2. SimpleJsonOutputParser 回答的问题，还会衍生一个问题，不需要定义pydantic
 
 prompt = ChatPromptTemplate.from_template("""
 尽你所能回答用户的问题。
