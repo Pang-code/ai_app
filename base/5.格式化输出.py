@@ -35,3 +35,18 @@ chain = prompt | tongyi_llm | parser
 # 4. 调用（返回字典）
 response = chain.invoke({"question": "介绍电影《盗梦空间》"})
 print(response)
+
+
+
+
+
+
+# 5. 绑定工具方式
+
+runnable=tongyi_llm.bind_tools( [Movie])
+respj = runnable.invoke("介绍电影《盗梦空间》")
+
+
+print(respj.tool_calls[-1]['args'])
+
+respj.pretty_print()
