@@ -32,3 +32,32 @@ response = chain.invoke({
 
 print("\n模型回复：")
 print(response.content)
+
+
+
+
+
+
+
+"""
+还有作用是就是消息可以作为历史聊天作为上下文
+
+这将生成一个包含两个消息的列表，第一个是系统消息，第二个是我们传入的HumanMessage。后面的消息就是我 和Al 大模型对话过程中的历史消息。这对于将消息列表插入到特定位置非常有用。
+
+prompt = ChatPromptTemplate.from_messages([
+    (
+        'system',
+        '你是一个智能助手，尽可能的调用工具回答用户的问题'
+    ),
+    MessagesPlaceholder(
+        variable_name='chat_history',
+        optional=True
+    ),
+    ('human', '{input}'),
+    MessagesPlaceholder(
+        variable_name='agent_scratchpad',
+        optional=True
+    ),
+])
+
+"""
