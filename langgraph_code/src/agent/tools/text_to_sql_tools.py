@@ -42,7 +42,7 @@ class ListTablesTool(BaseTool):
             return f"获取数据库表信息失败: {str(e)}"
 
 
-    async def _run(self) -> str:
+    async def _arun(self) -> str:
         return self._run()
 
 from pydantic import BaseModel, Field, create_model
@@ -54,7 +54,7 @@ class TableSchemaTool(BaseTool):
     name: str = "sql_db_schema"
     description: str = (
         "获取MySQL数据库中指定表的详细模式信息，包括列定义、主键、外键等。"
-        "输入应为逗号分隔的表名列表，或留空获取所有表的模式信息。"
+        "输入应为逗号分隔的表名列表，获取所有表的信息。"
     )
     db_manager: MySQLDatabaseManager
 
@@ -62,26 +62,26 @@ class TableSchemaTool(BaseTool):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
         # self.db_manager = db_manager
-        self.args_schema = create_model("TableSchemaToolArgs",table_namesj= (Optional[List[str]],Field(description="表名列表。")))
+        self.args_schema = create_model("TableSchemaToolArgs",table_names= (Optional[str],Field(description="逗号分隔的表名列表，例如'table1, table2'")))
 
 
-    def _run(self, table_names: Optional[List[str]] = None) -> str:
+    def _run(self, table_names: Optional[str] = None) -> str:
         try:
 
-            # table_list = None
-            # # 将输入的逗号分隔字符串转为列表
-            # if table_names:
-            #     table_names = table_names.strip()
-            #     table_list = [t.strip() for t in table_names.split(",")] if table_names else None
+            table_list = None
+            # 将输入的逗号分隔字符串转为列表
+            if table_names:
+                table_names = table_names.strip()
+                table_list = [t.strip() for t in table_names.split(",")] if table_names else None
             # 调用之前实现的 get_table_schema 方法
-            schema_info = self.db_manager.get_table_schema(table_names)
+            schema_info = self.db_manager.get_table_schema(table_list)
             return schema_info  if schema_info else "未找到匹配的表"
         except Exception as e:
             log.exception(e)
             return f"获取表结构信息失败: {str(e)}"
 
-    async def _run(self) -> str:
-        return self._run()
+    async def _arun(self,table_names: Optional[str]=None) -> str:
+        return self._run(table_names)
 
 
 
@@ -109,8 +109,8 @@ class SQLQueryTool(BaseTool):
         except Exception as e:
             return f"执行查询时出错: {str(e)}"
 
-    async def _run(self) -> str:
-        return self._run()
+    async def _arun(self, query: str) -> str:
+        return self._run(query)
 
 
 
@@ -139,8 +139,8 @@ class SQLQueryCheckerTool(BaseTool):
             return f"SQL语法检查时出错: {str(e)}"
 
 
-    async def _run(self) -> str:
-        return self._run()
+    async def _arun(self, query: str) -> str:
+        return self._run(query)
 
 if __name__ == '__main__':
     # 配置数据库连接信息
