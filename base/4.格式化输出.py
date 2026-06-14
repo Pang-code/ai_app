@@ -1,5 +1,8 @@
-
+from langchain_core.output_parsers import SimpleJsonOutputParser
 from pydantic import BaseModel, Field
+
+# 1.with_structured_output
+
 
 class Movie(BaseModel):
     """电影详情。"""
@@ -27,7 +30,7 @@ print(resp)
 import json
 from typing import Optional
 from pydantic import BaseModel, Field
-from langchain_core.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate, ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 
 # 1. 使用 Pydantic 定义数据模型，约束笑话的输出格式
@@ -57,3 +60,30 @@ print("\n字典格式输出：")
 print(resp.__dict__)
 print("\nJSON 格式输出：")
 print(json.dumps(resp.__dict__))
+
+
+
+
+
+
+
+
+# 2. SimpleJsonOutputParser 回答的问题还会衍生一个问题
+
+prompt = ChatPromptTemplate.from_template("""
+尽你所能回答用户的问题。
+
+你必须始终输出一个包含"answer"和"followup_question"键的JSON对象。
+其中"answer"代表：对用户问题的回答；
+"followup_question"代表：用户可能提出的后续问题。
+
+{question}
+""")
+
+
+# 3. 构建链式调用：提示词 → 大模型 → JSON解析器
+chain = prompt | deepseek_llm | SimpleJsonOutputParser()
+
+# 4. 执行调用
+resp = chain.invoke({"question": "细胞的动力源是什么？"})
+print(resp)
