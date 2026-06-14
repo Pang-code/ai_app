@@ -50,6 +50,12 @@ qwen_llm = ChatOpenAI(
     api_key=DASHSCOPE_API_KEY,
     base_url=DASHSCOPE_BASE_URL,
     model="qwen3.7-max",
+    #开启思考模式
+    # temperature=0.5,
+    # max_tokens=1024,
+    # timeout=60,
+    # reasoning_effort="low",
+    # max_retries=2,
 )
 
 # ==================== 字节豆包 Doubao ====================
