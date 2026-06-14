@@ -3,13 +3,14 @@ from init_llm import deepseek_llm,tongyi_llm
 # 输出解释器
 
 
-from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
 
 
 # 1. 定义结构
 class Movie(BaseModel):
+    """数据模型类 povo 电影"""
     title: str = Field(description="电影标题")
     year: int = Field(description="上映年份")
     director: str = Field(description="导演")
@@ -29,6 +30,7 @@ prompt = ChatPromptTemplate.from_template("""
 # 3. 创建链
 # chain = prompt | deepseek_reasoner_llm | parser
 chain = prompt | tongyi_llm | parser
+# chain = prompt | tongyi_llm | StrOutputParser()
 
 # 4. 调用（返回字典）
 response = chain.invoke({"question": "介绍电影《盗梦空间》"})
