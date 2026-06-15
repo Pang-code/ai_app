@@ -60,7 +60,8 @@ def summarize_messages(current_input):
     # 2. 获取当前会话全部聊天记录
     chat_history = get_session_history(session_id)
     stored_messages = chat_history.messages
-
+    if len(stored_messages) <= 2:
+        return False
     # 取出最后2条最新消息，完整保留不做摘要
     last_two_messages = stored_messages[-2:]
     # 取出除最后2条以外的全部历史消息，用于执行摘要压缩
