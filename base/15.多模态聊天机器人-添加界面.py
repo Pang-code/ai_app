@@ -140,14 +140,15 @@ import gradio as gr
 def add_message(chat_history, user_message):
     if user_message:
         chat_history.append({'role': 'user', 'content': user_message})
-    return chat_history, ''
+    # return chat_history, ''
+    return chat_history, gr.Textbox(value=None, interactive=False)
 
 
 
 def execute_chain(chat_history):
     input=chat_history[-1]
     resp = final_chain.invoke(
-        {"input": input, 'config':{"configurable": {"session_id": "user2"}}},
+        {"input": input['content'], 'config':{"configurable": {"session_id": "user2"}}},
         config={"configurable": {"session_id": "user2"}}
     )
     chat_history.append({'role': 'assistant', 'content': resp.content})
