@@ -49,7 +49,8 @@ deepseek_llm = ChatDeepSeek(
 qwen_llm = ChatOpenAI(
     api_key=DASHSCOPE_API_KEY,
     base_url=DASHSCOPE_BASE_URL,
-    model="qwen3.7-max",
+    model="qwen3.7-plus",
+    # model="qwen3.5-omni-flash",
     #开启思考模式
     # temperature=0.5,
     # max_tokens=1024,
@@ -57,14 +58,14 @@ qwen_llm = ChatOpenAI(
     # reasoning_effort="low",
     # max_retries=2,
 )
-
+# print(qwen_llm.invoke("你是谁？"))
 # ==================== 字节豆包 Doubao ====================
 doubao_llm = ChatOpenAI(
     api_key=DOUBAO_API_KEY,
     base_url=DOUBAO_BASE_URL,
     model="doubao-seed-2-0-pro-260215",
 )
-
+# print(doubao_llm.invoke("你是谁？"))
 # ==================== zhipu ====================
 zhipu_llm = ChatOpenAI(
     api_key=ZHIPUAI_API_KEY,
