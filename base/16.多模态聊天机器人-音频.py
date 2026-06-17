@@ -1,0 +1,244 @@
+from langchain_community.chat_message_histories import SQLChatMessageHistory
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.runnables import RunnableWithMessageHistory, RunnablePassthrough
+
+prompt = ChatPromptTemplate.from_messages([
+    (
+        'system',
+        '{system_message}'
+    ),
+    MessagesPlaceholder(variable_name='chat_history', optional=True),
+
+    ('human', '{input}'),
+    # MessagesPlaceholder(variable_name='agent_scratchpad', optional=True),
+])
+from my_llm import qwen_llm
+
+# 6. 构建链并调用
+chain = prompt | qwen_llm
+
+
+
+
+
+from langchain_core.chat_history import InMemoryChatMessageHistory
+
+# 全局会话存储容器
+# store = {}  # key: session_id(str), value: InMemoryChatMessageHistory 对象
+
+def get_session_history(session_id: str):
+    """从关系型数据库的历史消息列表中 返回当前会话 的所有历史消息"""
+    return SQLChatMessageHistory(
+        session_id=session_id,
+        connection_string='sqlite:///chat_history.db',# 可以是任何关系型数据库
+    )
+
+
+
+
+
+
+
+
+
+# 3、创建带历史记录功能的处理链
+chain_with_message_history = RunnableWithMessageHistory(
+    chain,
+    get_session_history,
+    input_messages_key='input',
+    history_messages_key='chat_history',
+)
+
+
+def summarize_messages(current_input):
+    """剪辑和摘要上下文，历史记录"""
+    # 1. 从入参中提取会话ID
+    session_id = current_input['config']["configurable"]["session_id"]
+    if not session_id:
+        raise ValueError("必须通过config参数提供session_id")
+
+    # 2. 获取当前会话全部聊天记录
+    chat_history = get_session_history(session_id)
+    stored_messages = chat_history.messages
+    if len(stored_messages) <= 2:  # 保留最近2条消息的阈值
+        return {"original_messages": stored_messages, "summary": None}
+    # 取出最后2条最新消息，完整保留不做摘要
+    last_two_messages = stored_messages[-2:]
+    # 取出除最后2条以外的全部历史消息，用于执行摘要压缩
+    messages_to_summarize = stored_messages[:-2]
+
+    summarization_prompt = ChatPromptTemplate.from_messages([
+        ("system", "请将以下对话历史压缩为一条保留关键信息的摘要消息。"),
+        ("placeholder", "{chat_history}"),
+        ("human", "请生成包含上述对话核心内容的摘要，保留重要事实和决策。")
+    ])
+
+
+    summarization_chain = summarization_prompt | qwen_llm
+    summary_message = summarization_chain.invoke({'chat_history': messages_to_summarize})
+
+    return {
+        "original_messages": last_two_messages,
+        "summary": summary_message
+    }
+
+
+
+# 最终的链
+# 最终的链
+# RunnablePassthrough 默认会将输入数据原样传递到下游，而 .assign() 方法允许在保留原始输入的同时，通过指定键值对（如 messages_xxx）追加新字段到输入字典中
+final_chain = RunnablePassthrough.assign(messages_summarized=summarize_messages) | RunnablePassthrough.assign(
+    input=lambda x: x["input"],
+    chat_history=lambda x: x["messages_summarized"]["original_messages"],
+    system_message=lambda x: f'你是一个乐于助人的助手。尽你所能回答所有问题。摘要：{x["messages_summarized"]["summary"].content}' if x["messages_summarized"].get("summary") else "无摘要"
+) | chain_with_message_history
+
+
+
+
+
+# 第一次对话
+# # 调用带会话记忆的对话链
+# resp = final_chain.invoke(
+#     {"input": "你好，我名字叫：pcw", 'config':{"configurable": {"session_id": "user2"}}},
+#     config={"configurable": {"session_id": "user2"}}
+# )
+# print("模型回复1：")
+# print(resp)
+#
+#
+#
+# # 第二次对话
+# # 调用带会话记忆的对话链
+# resp = final_chain.invoke(
+#     {"input": "你好，我叫什么名字？", 'config':{"configurable": {"session_id": "user2"}}},
+#     config={"configurable": {"session_id": "user2"}}
+# )
+# print("模型回复2：")
+# print(resp)
+
+
+# 第二次对话
+# # 调用带会话记忆的对话链
+# resp = final_chain.invoke(
+#     {"input": "你好，我的名字有哪些重名的人物吗?", 'config':{"configurable": {"session_id": "user2"}}},
+#     config={"configurable": {"session_id": "user2"}}
+# )
+# print("模型回复2：")
+# print(resp)
+
+
+# 开发机器人的界面
+
+# gradio
+
+
+import gradio as gr
+
+
+# web界面中的核心函数
+def add_message(chat_history, user_message):
+    if user_message:
+        chat_history.append({'role': 'user', 'content': user_message})
+    return chat_history, ''
+    # return chat_history, gr.Textbox(value=None, interactive=False)
+
+
+
+def execute_chain(chat_history):
+    input=chat_history[-1]
+    resp = final_chain.invoke(
+        {"input": input['content'], 'config':{"configurable": {"session_id": "user2"}}},
+        config={"configurable": {"session_id": "user2"}}
+    )
+    chat_history.append({'role': 'assistant', 'content': resp.content})
+
+    return chat_history
+
+
+# from zhipuai import ZhipuAI
+#
+# def read_audio(audio_message):
+#     """读取音频文件，调用智谱GLM-ASR语音转文字"""
+#     print(audio_message)
+#     if audio_message:
+#         # 初始化智谱AI客户端
+#         client = ZhipuAI(api_key="ZHIPU_API_KEY")
+#         # 二进制只读打开wav音频文件
+#         with open(audio_message, "rb") as audio_file:
+#             resp = client.audio.transcriptions.create(
+#                 model="glm-asr",
+#                 file=audio_file,
+#                 stream=False
+#             )
+#         # 从返回结果取出识别文本
+#         text = resp.model_extra['text']
+#         print(text)
+#         return text
+#     # 无音频文件返回空字符串
+#     return ''
+
+
+def read_audio(audio_message):
+    """读取音频文件，调用智谱GLM-ASR语音转文字"""
+    print(audio_message)
+    if audio_message:
+        import zhipuai
+
+        # 设置 API Key
+        zhipuai.api_key = "你的API_KEY"
+
+        # 使用旧版 API 调用语音识别
+        with open(audio_message, "rb") as audio_file:
+            resp = zhipuai.model_api.invoke(
+                model="glm-asr",
+                prompt=[{"role": "user", "content": audio_file.read()}],
+            )
+
+        # 从返回结果取出识别文本（根据实际响应结构调整）
+        text = resp.get('data', {}).get('text', '') if resp else ''
+        print(text)
+        return text
+    # 无音频文件返回空字符串
+    return ''
+
+
+with gr.Blocks(title='多模态聊天机器人', theme=gr.themes.Soft()) as block:
+    # 聊天历史记录的组件
+    # chatbot = gr.Chatbot(type='messages', height=500, label='聊天机器人')
+    chatbot = gr.Chatbot( height=1000, label='聊天机器人')
+
+    with gr.Row():
+
+        # 左侧宽列：文本输入+发送按钮，横向权重4
+        with gr.Column(scale=4):
+            user_input = gr.Textbox(
+                placeholder='请给机器人发送消息...',
+                label='文字输入',
+                max_lines=5
+            )
+            # 主样式发送按钮
+            submit_btn = gr.Button(value='发送', variant="primary")
+
+        # 右侧窄列：语音麦克风输入，横向权重1
+        with gr.Column(scale=1):
+            audio_input = gr.Audio(
+                sources=['microphone'],
+                label='语音输入',
+                type='filepath',
+                format='wav'
+            )
+
+    # 发送按钮点击触发相同逻辑
+    chat_msg=submit_btn.click(add_message, inputs=[chatbot, user_input], outputs=[chatbot, user_input])
+    chat_msg.then(execute_chain, chatbot, chatbot)
+    # 语音输入框的改变事件
+    audio_input.change(read_audio, inputs=[audio_input], outputs=[user_input])
+
+    # 按钮点击的事件
+    submit_btn.click(add_message, [chatbot, user_input], [chatbot, user_input]).then(execute_chain, chatbot,
+                                                                                     chatbot)
+
+
+if __name__ == '__main__':
+    block.launch()
