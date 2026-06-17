@@ -33,3 +33,6 @@ print(resp[0])
 
 # 模型会下载到缓存目录下，默认为 ~.cache\huggingface\hub\models--BAAI--bge-small-zh-v1.5
 # 也可以手动指定缓存目录 在环境变量设置 HF_HOME=your_cache_dir
+
+# pip uninstall torch torchvision torchaudio
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
