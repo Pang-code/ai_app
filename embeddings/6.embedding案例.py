@@ -1,5 +1,7 @@
 import pandas as pd
 from langchain_community.embeddings import HuggingFaceEmbeddings
+import numpy as np
+import ast
 
 model_name = "BAAI/bge-small-zh-v1.5"
 model_kwargs = {'device': 'cpu'}
@@ -35,5 +37,46 @@ def text_2_embedding(text):
     )
     return resp[0]
 
+
+def cosine_distance(a, b):
+    """
+    计算两个向量的余弦距离
+    :param a:
+    :param b:
+    :return:
+    """
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+
+def search_text(input, embedding_file, top_n=3):
+    """
+    根据用户输入的问题，进行语义检索，返回最相似的前top_n个结果
+    :param input:
+    :param top_n:
+    :return:
+    """
+    df_data = pd.read_csv(embedding_file)
+    # 把字符串变成向量，保存到新字段
+    df_data['embedding_vector'] = df_data['embedding'].apply(ast.literal_eval)
+    input_vector = text_2_embedding(input)
+
+
+
+    df_data['similarity'] = df_data.embedding_vector.apply(lambda x: cosine_distance(x, input_vector))
+
+    res = (
+        df_data.sort_values(by='similarity', ascending=False)
+        .head(top_n)
+        .text_content.str.replace('Summary: ', "")  # text_content是字段名
+        .str.replace('; Text: ', '; ')
+    )
+
+    for r in res:
+        print(r)
+        print('-' * 30)
+
+
+
 if __name__ == '__main__':
-    embedding_2_file(source_file='../datas/fine_food_reviews_100.csv', output_file='../datas/fine_food_reviews_100_embedding.csv.csv')
+    embedding_2_file(source_file='../datas/fine_food_reviews_100.csv', output_file='../datas/fine_food_reviews_100_embedding.csv')
+    search_text(input='delicious beans', embedding_file='../datas/fine_food_reviews_100_embedding.csv')
