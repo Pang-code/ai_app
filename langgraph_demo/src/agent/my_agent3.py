@@ -4,6 +4,7 @@ from langgraph.prebuilt import create_react_agent
 
 from agent.init_llm import qwen_llm as llm
 from agent.tools.tool_demo6 import runnable_tool
+from agent.tools.tool_demo8 import get_user_info_by_name
 from agent.tools.tool_demo_arg2 import calculate3
 # from agent.tools.tool_demo7 import MySearchTool
 from langchain_core.messages import AnyMessage,BaseMessage
@@ -28,7 +29,7 @@ def prompt(state: AgentState, config: RunnableConfig) -> list[AnyMessage]:
 # 构建ReAct智能体状态图
 my_agent3 = create_react_agent(
     llm,
-    tools=[calculate3, runnable_tool],
+    tools=[calculate3, runnable_tool,get_user_info_by_name],
     prompt=prompt
 )
 

@@ -13,11 +13,12 @@ for chunk in client.runs.stream(
         input={
             "messages": [{
                 "role": "human",
-                "content": "今天深圳的天气",
+                "content": "告诉我当前用户的年龄",
             }],
         },
-        stream_mode="messages-tuple",
-        # stream_mode="messages",
+        # stream_mode="messages-tuple",
+        stream_mode="messages",
+        config={"configurable": {"user_name": "张三"}}
 ):
     # print(f"Receiving new event of type: {chunk.event}...")
     print(chunk.data)
