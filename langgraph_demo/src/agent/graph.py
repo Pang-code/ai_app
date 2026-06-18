@@ -19,6 +19,12 @@ graph = create_react_agent(
     prompt="你是一个智能助手"
 )
 
+
+# 启动方式1
 # 单轮调用示例
-res = graph.invoke({"messages": [("user", "深圳今天天气怎么样？")]})
-print(res["messages"][-1].content)
+# res = graph.invoke({"messages": [("user", "深圳今天天气怎么样？")]})
+# print(res["messages"][-1].content)
+
+# 启动方式2
+# langgraph dev
+
