@@ -15,6 +15,7 @@ dependencies = [
     "langgraph-cli>=0.4.14",
     "langgraph-sdk>=0.4.2",
     "python-dotenv>=1.0.1",
+    "zhipuai>=1.0.7",
 ]
 
 
