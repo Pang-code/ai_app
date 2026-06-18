@@ -1,7 +1,8 @@
 from langchain_core.tools import tool
 from typing import Annotated
 
-@tool(name="calculate3", parse_docstring=True)
+# @tool(name="calculate3", parse_docstring=True)
+@tool()
 def calculate3(a: Annotated[float, '第一个需要输入的数字。'],
               b: Annotated[float, '第二个需要输入的数字。'],
               operation: Annotated[str, '运算类型，只能是add、subtract、multiply和divide中的任意一个。']
@@ -26,11 +27,11 @@ def calculate3(a: Annotated[float, '第一个需要输入的数字。'],
     return result
 
 
-print(calculate3.name)
-# 输出: calculate
-print(calculate3.description)
-# 输出: 工具函数：计算两个数字的运算结果
-print(calculate3.args)
-print(calculate3.args_schema.model_json_schema())
-print(calculate3.return_direct)
-print(calculate3.invoke({'a': 40, 'b': 2, 'operation': 'multiply'}))
+# print(calculate3.name)
+# # 输出: calculate
+# print(calculate3.description)
+# # 输出: 工具函数：计算两个数字的运算结果
+# print(calculate3.args)
+# print(calculate3.args_schema.model_json_schema())
+# print(calculate3.return_direct)
+# print(calculate3.invoke({'a': 40, 'b': 2, 'operation': 'multiply'}))
