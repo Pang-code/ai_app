@@ -71,3 +71,7 @@ def get_config() -> dict:
 
 if __name__ == "__main__":
     server.run(transport="stdio")  # 启动服务
+
+
+
+# uv add fastmcp  langchain-mcp-adapters
