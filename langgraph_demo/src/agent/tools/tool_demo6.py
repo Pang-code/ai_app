@@ -29,10 +29,11 @@ runnable_tool = chain.as_tool(
 )
 
 
+if __name__ == '__main__':
 
-# 打印工具入参完整 JSON Schema（Pydantic 模型转接口规范）
-print(runnable_tool.args_schema.model_json_schema())
-# 打印工具名称
-print(runnable_tool.name)
-# 打印工具功能描述
-print(runnable_tool.description)
+    # 打印工具入参完整 JSON Schema（Pydantic 模型转接口规范）
+    print(runnable_tool.args_schema.model_json_schema())
+    # 打印工具名称
+    print(runnable_tool.name)
+    # 打印工具功能描述
+    print(runnable_tool.description)
