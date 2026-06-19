@@ -4,7 +4,8 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.types import Command
 from langchain_core.messages import ToolMessage
 from langchain_core.tools import InjectedToolCallId
-
+from langgraph.prebuilt import InjectedState
+from agent.my_state import CustomState
 # agentstate 记忆
 
 
@@ -25,3 +26,12 @@ def get_user_name(tool_call_id: Annotated[str, InjectedToolCallId],
             )
         ]
     })
+
+
+
+
+@tool
+def greet_user(state: Annotated[CustomState, InjectedState]) -> None:
+    """在获取用户的username之后，生成祝福语句"""
+    username = state['username']  # 从状态中获取用户名
+    return f'祝贺你：{username}！'
