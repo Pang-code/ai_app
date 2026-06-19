@@ -2,7 +2,7 @@
   "$schema": "https://langgra.ph/schema.json",
   "dependencies": ["."],
   "graphs": {
-    "agent": "./src/agent/my_agent3.py:my_agent3"
+    "agent": "./src/agent/my_agent4.py:my_agent4"
   },
   "env": ".env",
   "image_distro": "wolfi"
