@@ -59,5 +59,15 @@ def generate_code_request(language: str, task_description: str) -> PromptMessage
     )
 
 
+# 结构化资源：自动序列化字典为JSON
+@server.resource("resource:///config")
+def get_config() -> dict:
+    """以JSON格式返回配置信息"""
+    return {
+        "theme": "dark",          # 界面主题配置
+        "version": "1.2.0",       # 当前版本号
+        "features": ["tools", "resources"],  # 已启用的功能模块
+    }
+
 if __name__ == "__main__":
     server.run(transport="stdio")  # 启动服务
