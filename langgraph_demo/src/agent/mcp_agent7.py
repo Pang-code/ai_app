@@ -43,7 +43,8 @@ async def create_agent():
         server_name='python_mcp',  # mcp 服务端名称
         uris='resource:///config'
     )
-    print(data)
+    print(data[0])
+    print(data[0].data)
 
     my_agent7 = create_react_agent(
         llm,
