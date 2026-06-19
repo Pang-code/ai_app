@@ -16,12 +16,18 @@ python_mcp_server_config = {
     'transport': 'streamable_http',
 }
 
+java_mcp_server_config = {
+    'url': 'http://127.0.0.1:8080/sse',
+    'transport': 'sse',
+}
+
 from langchain_mcp_adapters.client import MultiServerMCPClient
 
 # MCP的客户端
 mcp_client = MultiServerMCPClient(
     {
         'python_mcp': python_mcp_server_config,
+        'java_mcp': java_mcp_server_config,
     }
 )
 
