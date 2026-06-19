@@ -1,11 +1,9 @@
 import os
 from fastmcp import FastMCP
-from zhipuai import ZhipuAI
 
-server = FastMCP(name="my-server")
+server = FastMCP(name="pcw_server",instructions='Python代码实现MCP服务器')
 
-# 初始化智谱AI客户端
-zhipuai_client = ZhipuAI(api_key=os.getenv("ZHIPU_API_KEY"))
+
 
 
 @server.tool
@@ -17,6 +15,10 @@ def greet(name: str) -> str:
 def my_search(query: str) -> str:
     """搜索互联网上的内容，包括实时天气等"""
     try:
+        from zhipuai import ZhipuAI
+
+        # 初始化智谱AI客户端
+        zhipuai_client = ZhipuAI(api_key=os.getenv("ZHIPU_API_KEY"))
         print("执行我的Python中的工具，输入的参数为:", query)
         response = zhipuai_client.web_search.web_search(
             search_engine="search_pro",
