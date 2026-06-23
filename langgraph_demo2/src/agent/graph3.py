@@ -69,7 +69,7 @@ class BasicToolsNode:
         Args:
             tools: 工具列表，每个工具需包含name属性
         """
-        self.tools_by_name = {tool.name for tool in tools} # 所有工具名字
+        self.tools_by_name = {tool.name:tool for tool in tools} # 所有工具名字
 
     async def __call__(self, state: Dict[str, Any], **kwargs) -> Dict[str, List[ToolMessage]]:
         """异步调用入口
